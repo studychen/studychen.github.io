@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Android实现RecyclerView下拉刷新和上拉加载更多 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="需求先上效果图， Material Design风格的下拉刷新和上拉加载更多。
+ 
+源码地址（欢迎star） https://github.com/studychen/SeeNewsV2
+如果对于RecyclerView还不熟悉，参见这篇 Android Material Design学习之RecyclerView代替 ListView
+本文链接 http://blog.csdn.net/neve">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android实现RecyclerView下拉刷新和上拉加载更多">
+<meta property="og:url" content="http://yoursite.com/2016/08/25/recyclerview-push/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="需求先上效果图， Material Design风格的下拉刷新和上拉加载更多。
+ 
+源码地址（欢迎star） https://github.com/studychen/SeeNewsV2
+如果对于RecyclerView还不熟悉，参见这篇 Android Material Design学习之RecyclerView代替 ListView
+本文链接 http://blog.csdn.net/neve">
+<meta property="og:image" content="http://img.blog.csdn.net/20160228161108026">
+<meta property="og:image" content="http://img.blog.csdn.net/20160228110719719">
+<meta property="og:image" content="http://img.blog.csdn.net/20160228111027125">
+<meta property="og:image" content="http://img.blog.csdn.net/20160228112544303">
+<meta property="og:updated_time" content="2017-02-09T12:48:55.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android实现RecyclerView下拉刷新和上拉加载更多">
+<meta name="twitter:description" content="需求先上效果图， Material Design风格的下拉刷新和上拉加载更多。
+ 
+源码地址（欢迎star） https://github.com/studychen/SeeNewsV2
+如果对于RecyclerView还不熟悉，参见这篇 Android Material Design学习之RecyclerView代替 ListView
+本文链接 http://blog.csdn.net/neve">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20160228161108026">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-recyclerview-push" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/08/25/recyclerview-push/" class="article-date">
+  <time datetime="2016-08-25T11:20:58.000Z" itemprop="datePublished">2016-08-25</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Android实现RecyclerView下拉刷新和上拉加载更多
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h1><p>先上效果图， Material Design风格的下拉刷新和上拉加载更多。</p>
+<p><img src="http://img.blog.csdn.net/20160228161108026" alt="blog.csdn.net/never_cxb" title="screenshot" width="270" height="486"> </p>
+<p>源码地址（欢迎star） <a href="https://github.com/studychen/SeeNewsV2" target="_blank" rel="external">https://github.com/studychen/SeeNewsV2</a></p>
+<p>如果对于RecyclerView还不熟悉，参见这篇 <a href="http://blog.csdn.net/never_cxb/article/details/50495505" target="_blank" rel="external">Android Material Design学习之RecyclerView代替 ListView</a></p>
+<p>本文链接 <a href="http://blog.csdn.net/never_cxb/article/details/50759109" target="_blank" rel="external">http://blog.csdn.net/never_cxb/article/details/50759109</a> 转载请注明出处</p>
+<h1 id="下拉刷新"><a href="#下拉刷新" class="headerlink" title="下拉刷新"></a>下拉刷新</h1><h2 id="效果图"><a href="#效果图" class="headerlink" title="效果图"></a>效果图</h2><p>上拉时候会有一个圆形动画，刷新加载数据。</p>
+<p><img src="http://img.blog.csdn.net/20160228110719719" width="40%" height="40%" alt="http://blog.csdn.net/never_cxb/" align="center"></p>
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>使用Google官方的<code>android.support.v4.widget.SwipeRefreshLayout</code></p>
+<h2 id="列表RecyclerView的xml布局"><a href="#列表RecyclerView的xml布局" class="headerlink" title="列表RecyclerView的xml布局"></a>列表RecyclerView的xml布局</h2><p>给原来的RecyclerView增加一个SwipeRefreshLayout的父布局<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</div><div class="line">&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</div><div class="line">    android:layout_width=&quot;match_parent&quot;</div><div class="line">    android:layout_height=&quot;match_parent&quot;</div><div class="line">    android:background=&quot;?attr/listBackground&quot;</div><div class="line">    android:orientation=&quot;vertical&quot;&gt;</div><div class="line">    &lt;android.support.v4.widget.SwipeRefreshLayout</div><div class="line">        android:id=&quot;@+id/swiperefreshlayout&quot;</div><div class="line">        android:layout_width=&quot;match_parent&quot;</div><div class="line">        android:layout_height=&quot;wrap_content&quot;&gt;</div><div class="line">        &lt;!-- 新闻列表展示--&gt;</div><div class="line">        &lt;android.support.v7.widget.RecyclerView</div><div class="line">            android:id=&quot;@+id/rcv_article_origin&quot;</div><div class="line">            android:layout_width=&quot;match_parent&quot;</div><div class="line">            android:layout_height=&quot;match_parent&quot; /&gt;</div><div class="line">    &lt;/android.support.v4.widget.SwipeRefreshLayout&gt;</div><div class="line">&lt;/LinearLayout&gt;</div></pre></td></tr></table></figure></p>
+<h2 id="java代码"><a href="#java代码" class="headerlink" title="java代码"></a>java代码</h2><p>这儿有几个注意点：<br><code>setColorSchemeColors()</code>可以控制圆形动画的颜色，最多设置4个。</p>
+<p><code>setOnRefreshListener</code> 设置下拉刷新的回调事件。</p>
+<p>下拉刷新后，使用 AsyncTask 根据当前RecyclerView中首个Item的id来加载更多数据。</p>
+<p>数据加载完毕后，使用<code>setRefreshing(false);</code>取消动画。</p>
+<p>如果刷新后得到0条记录，提示<code>没有数据更新</code>。若得到&gt;0条数据，把数据加到RecyclerView中</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">mSwipeRefreshLayout.setColorSchemeColors(Color.RED, Color.BLUE);</div><div class="line">mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() &#123;</div><div class="line">    @Override</div><div class="line">    public void onRefresh() &#123;</div><div class="line">        new MoreArticleTask().execute(mAdapter.getTopArticleId());</div><div class="line">    &#125;</div><div class="line">&#125;);</div><div class="line">        </div><div class="line">// Integer 是输入参数</div><div class="line">// 得到比某个id大的新闻数组</div><div class="line">class MoreArticleTask extends AsyncTask&lt;Integer, Void, List&lt;SimpleArticleItem&gt;&gt; &#123;</div><div class="line">    @Override</div><div class="line">    protected List&lt;SimpleArticleItem&gt; doInBackground(Integer... params) &#123;</div><div class="line">        try &#123;</div><div class="line">            Thread.sleep(1500);</div><div class="line">        &#125; catch (InterruptedException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">        return getMoreById(mColumn, params[0]);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected void onPostExecute(List&lt;SimpleArticleItem&gt; simpleArticleItems) &#123;</div><div class="line">        super.onPostExecute(simpleArticleItems);</div><div class="line"></div><div class="line">        if (mSwipeRefreshLayout != null) &#123;</div><div class="line">            mSwipeRefreshLayout.setRefreshing(false);</div><div class="line">        &#125;</div><div class="line">        //没有新的数据，提示消息</div><div class="line">        if (simpleArticleItems == null || simpleArticleItems.size() == 0) &#123;</div><div class="line">            Snackbar.with(mActivity.getApplicationContext()) // context</div><div class="line">                    .text(mActivity.getResources().getString(R.string.list_more_data)) // text to display</div><div class="line">                    .duration(Snackbar.SnackbarDuration.LENGTH_SHORT) // make it shorter</div><div class="line">                    .show(mActivity); // activity where it is displayed</div><div class="line">        &#125; else &#123;</div><div class="line">            mArticleList.addAll(simpleArticleItems);</div><div class="line">            mAdapter.notifyDataSetChanged();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="首次进入页面就显示加载ing的动画"><a href="#首次进入页面就显示加载ing的动画" class="headerlink" title="首次进入页面就显示加载ing的动画"></a>首次进入页面就显示加载ing的动画</h2><p>效果如下：</p>
+<p><img src="http://img.blog.csdn.net/20160228111027125" width="40%" height="40%" alt="http://blog.csdn.net/never_cxb/" align="center"></p>
+<p>直接使用 <code>mSwipeRefreshLayout.setRefreshing(true);</code>加载动画初始状态并不显示。</p>
+<p>看了 <a href="http://stackoverflow.com/questions/26858692/swiperefreshlayout-setrefreshing-not-showing-indicator-initially" target="_blank" rel="external">http://stackoverflow.com/questions/26858692/swiperefreshlayout-setrefreshing-not-showing-indicator-initially</a> 的解答，<br>改用下面的代码，初始状态就有加载动画显示。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">mSwipeRefreshLayout.post(new Runnable() &#123;</div><div class="line">    @Override</div><div class="line">    public void run() &#123;</div><div class="line">        mSwipeRefreshLayout.setRefreshing(true);</div><div class="line">        new MoreArticleTask().execute(mAdapter.getTopArticleId());</div><div class="line">    &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<h1 id="上拉加载更多"><a href="#上拉加载更多" class="headerlink" title="上拉加载更多"></a>上拉加载更多</h1><p>RecyclerView 展示列表是个通用需求，那么当数据较多时候，如何实现分页加载呢？</p>
+<p>比如笔者的项目中，先加载15条新闻，当滑动到底部时候，再加载15条。</p>
+<h2 id="效果图-1"><a href="#效果图-1" class="headerlink" title="效果图"></a>效果图</h2><p><img src="http://img.blog.csdn.net/20160228112544303" width="40%" height="40%" alt="http://blog.csdn.net/never_cxb/" align="center"></p>
+<h2 id="思路-1"><a href="#思路-1" class="headerlink" title="思路"></a>思路</h2><p>在RecyclerView底部增加一个Footer的ViewHolder，数据加载完毕取出底部的ViewHolder。</p>
+<h2 id="底部Footer的xml布局文件"><a href="#底部Footer的xml布局文件" class="headerlink" title="底部Footer的xml布局文件"></a>底部Footer的xml布局文件</h2><p>很简单，就是一个ProgressBar。本项目为了Material Design，使用了一个开源ProgressBar  <a href="https://github.com/Todd-Davies/ProgressWheel" target="_blank" rel="external">https://github.com/Todd-Davies/ProgressWheel</a>，你也可以使用原生的ProgressBar。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&lt;!--上拉加载更多 RecyclerView 底部--&gt;</div><div class="line">&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</div><div class="line">    xmlns:wheel=&quot;http://schemas.android.com/apk/res-auto&quot;</div><div class="line">    android:layout_width=&quot;match_parent&quot;</div><div class="line">    android:layout_height=&quot;match_parent&quot;</div><div class="line">    android:orientation=&quot;vertical&quot;&gt;</div><div class="line">    &lt;com.pnikosis.materialishprogress.ProgressWheel</div><div class="line">        android:id=&quot;@+id/rcv_load_more&quot;</div><div class="line">        android:layout_width=&quot;40dp&quot;</div><div class="line">        android:layout_height=&quot;40dp&quot;</div><div class="line">        android:layout_gravity=&quot;center_horizontal&quot;</div><div class="line">        wheel:matProg_barColor=&quot;@color/accent&quot;</div><div class="line">        wheel:matProg_progressIndeterminate=&quot;true&quot; /&gt;</div><div class="line">&lt;/LinearLayout&gt;</div></pre></td></tr></table></figure></p>
+<p>##底部Footer的ViewHolder</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * 底部加载更多</div><div class="line"> */</div><div class="line">class FooterViewHolder extends RecyclerView.ViewHolder &#123;</div><div class="line">    @InjectView(R.id.rcv_load_more)</div><div class="line">    ProgressWheel rcvLoadMore;</div><div class="line"></div><div class="line">    public FooterViewHolder(View itemView) &#123;</div><div class="line">        super(itemView);</div><div class="line">        ButterKnife.inject(this, itemView);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="在Fragment中给RecyclerView增加滑动监听"><a href="#在Fragment中给RecyclerView增加滑动监听" class="headerlink" title="在Fragment中给RecyclerView增加滑动监听"></a>在Fragment中给RecyclerView增加滑动监听</h2><p><code>layoutManager.getItemCount()</code> 可以得到当前RecyclerView中Item的总数目</p>
+<p> <code>layoutManager.findLastVisibleItemPosition()</code> 得到最后一个可见的Item的位置position </p>
+<p>如果 totalItemCount &lt; (lastVisibleItem + Constant.VISIBLE_THRESHOLD) </p>
+<p>比如一共15个Item，当前到达第13个， Constant.VISIBLE_THRESHOLD设为3<br>总数小于最后一个+阈值，就加载更多新闻数据，同时把loading标记为 true 。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">private boolean loading = false;</div><div class="line"></div><div class="line">@Override</div><div class="line">public void onActivityCreated(@Nullable Bundle savedInstanceState) &#123;</div><div class="line">    super.onActivityCreated(savedInstanceState);</div><div class="line">    </div><div class="line">    mRecyclerView.setLayoutManager(new LinearLayoutManager(mActivity));</div><div class="line"></div><div class="line">    mAdapter = new OriginArticleAdapter(mActivity, mArticleList);</div><div class="line"></div><div class="line">    mRecyclerView.setAdapter(mAdapter);</div><div class="line"></div><div class="line">    mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() &#123;</div><div class="line">  </div><div class="line">        @Override</div><div class="line">        public void onScrolled(RecyclerView recyclerView, int dx, int dy) &#123;</div><div class="line"></div><div class="line">            super.onScrolled(recyclerView, dx, dy);</div><div class="line"></div><div class="line">            LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();</div><div class="line"></div><div class="line">            int totalItemCount = layoutManager.getItemCount();</div><div class="line">            </div><div class="line">            int lastVisibleItem = layoutManager.findLastVisibleItemPosition();</div><div class="line">            </div><div class="line">            if (!loading &amp;&amp; totalItemCount &lt; (lastVisibleItem + Constant.VISIBLE_THRESHOLD)) &#123;</div><div class="line">                new ArticleTask(mActivity).execute(mAdapter.getBottomArticleId());</div><div class="line">                loading = true;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="在Fragment中控制底部Footer"><a href="#在Fragment中控制底部Footer" class="headerlink" title="在Fragment中控制底部Footer"></a>在Fragment中控制底部Footer</h2><p>我们依然使用AsyncTask。</p>
+<p>注意 <code>onPreExecute()</code> 给 mArticleList 增加了一个null标记Footer，如果是第一次进入页面（mArticleList为空）不需要加Footer。</p>
+<p>当数据加载完毕后，用  <code>mArticleList.remove(mArticleList.size() - 1);</code>把最下面的Footer删除。</p>
+<p>再用 <code>mArticleList.addAll(moreArticles);</code> 增加新增的新闻数据，</p>
+<p>并用 <code>mAdapter.notifyDataSetChanged();</code> 通知 RecyclerView.Adapter 有数据改变。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div></pre></td><td class="code"><pre><div class="line">private List&lt;SimpleArticleItem&gt; mArticleList = new ArrayList&lt;SimpleArticleItem&gt;();</div><div class="line"></div><div class="line">class ArticleTask extends AsyncTask&lt;Integer, Void, List&lt;SimpleArticleItem&gt;&gt; &#123;</div><div class="line"></div><div class="line">    private Context mContext;</div><div class="line"></div><div class="line">    public ArticleTask(Context context) &#123;</div><div class="line">        mContext = context;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /**</div><div class="line">     * Runs on the UI thread before &#123;@link #doInBackground&#125;.</div><div class="line">     */</div><div class="line">    @Override</div><div class="line">    protected void onPreExecute() &#123;</div><div class="line">        super.onPreExecute();</div><div class="line">        if (mArticleList != null &amp;&amp; mArticleList.size() &gt; 0) &#123;</div><div class="line">            mArticleList.add(null);</div><div class="line">            </div><div class="line">            // notifyItemInserted(int position)，这个方法是在第position位置</div><div class="line">            // 被插入了一条数据的时候可以使用这个方法刷新，</div><div class="line">            // 注意这个方法调用后会有插入的动画，这个动画可以使用默认的，也可以自己定义。</div><div class="line">            mAdapter.notifyItemInserted(mArticleList.size() - 1);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /**</div><div class="line">     * @param params 偏移量 aid</div><div class="line">     * @return</div><div class="line">     */</div><div class="line">    @Override</div><div class="line">    protected List&lt;SimpleArticleItem&gt; doInBackground(Integer... params) &#123;</div><div class="line">        try &#123;</div><div class="line">            Thread.sleep(1500);</div><div class="line">        &#125; catch (InterruptedException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">        return getArticleList(mColumn, params[0]);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected void onPostExecute(final List&lt;SimpleArticleItem&gt; moreArticles) &#123;</div><div class="line">        // 新增新闻数据</div><div class="line">        super.onPostExecute(moreArticles);</div><div class="line">        if (mArticleList.size() == 0) &#123;</div><div class="line">            mArticleList.addAll(moreArticles);</div><div class="line">            mAdapter.notifyDataSetChanged();</div><div class="line">        &#125; else &#123;</div><div class="line">            //删除 footer</div><div class="line">            mArticleList.remove(mArticleList.size() - 1);</div><div class="line">            mArticleList.addAll(moreArticles);</div><div class="line">            mAdapter.notifyDataSetChanged();</div><div class="line">            loading = false;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="Override-RecyclerView-Adapter-中的-getItemViewType"><a href="#Override-RecyclerView-Adapter-中的-getItemViewType" class="headerlink" title="Override RecyclerView.Adapter 中的 getItemViewType"></a>Override RecyclerView.Adapter 中的 getItemViewType</h2><p><code>extends RecyclerView.Adapter&lt;RecyclerView.ViewHolder&gt;</code> 如果是null，返回Footer的Type；否则，返回正常新闻的Type。</p>
+<p>本文，为了UI美观，把新闻分为两种：大于3幅图片 、小于3幅图片，相应返回不同的Type和ViewHolder。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">public final static int TYPE_MULTI_IMAGES = 2; // 多个图片的文章</div><div class="line">public final static int TYPE_FOOTER = 3;//底部--往往是loading_more</div><div class="line">public final static int TYPE_NORMAL = 1; // 正常的一条文章</div><div class="line">@Override</div><div class="line">public int getItemViewType(int position) &#123;</div><div class="line"></div><div class="line">    SimpleArticleItem article = articleList.get(position);</div><div class="line">    if (article == null) &#123;</div><div class="line">        return TYPE_FOOTER;</div><div class="line">    &#125; else if (article.getImageUrls().length &gt;= 3) &#123;</div><div class="line">        return TYPE_MULTI_IMAGES;</div><div class="line">    &#125; else &#123;</div><div class="line">        return TYPE_NORMAL;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="Override-RecyclerView-Adapter-中的-onCreateViewHolder"><a href="#Override-RecyclerView-Adapter-中的-onCreateViewHolder" class="headerlink" title="Override RecyclerView.Adapter 中的 onCreateViewHolder"></a>Override RecyclerView.Adapter 中的 onCreateViewHolder</h2><p>在该方法中利用 <code>switch (viewType)</code> 返回不同的xml布局文件及ViewHolder<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) &#123;</div><div class="line"></div><div class="line">    RecyclerView.ViewHolder vh;</div><div class="line">    View view;</div><div class="line">    switch (viewType) &#123;</div><div class="line">        //其他无法处理的情况使用viewholder_article_simple</div><div class="line">        default:</div><div class="line">        case TYPE_NORMAL:</div><div class="line">            view = mLayoutInflater.inflate(</div><div class="line">                    R.layout.item_article_normal, parent, false);</div><div class="line">            vh = new ItemArticleViewHolder(view);</div><div class="line">            return vh;</div><div class="line">        case TYPE_FOOTER:</div><div class="line">            view = mLayoutInflater.inflate(</div><div class="line">                    R.layout.recyclerview_footer, parent, false);</div><div class="line">            vh = new FooterViewHolder(view);</div><div class="line">            return vh;</div><div class="line">        case TYPE_MULTI_IMAGES:</div><div class="line">            view = mLayoutInflater.inflate(</div><div class="line">                    R.layout.item_article_multi_images, parent, false);</div><div class="line">            vh = new MultiImagesViewHolder(view);</div><div class="line">            return vh;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="Override-RecyclerView-Adapter-中的-onBindViewHolder"><a href="#Override-RecyclerView-Adapter-中的-onBindViewHolder" class="headerlink" title="Override RecyclerView.Adapter 中的 onBindViewHolder"></a>Override RecyclerView.Adapter 中的 onBindViewHolder</h2><p>利用 instanceof 判断是何种类型的ViewHolder，来给控件赋值、绑定数据。</p>
+<p>注意：因为Footer是用null表示的，为了防止NullPointerException，<br>我们先用if把FooterViewHolder的情况处理了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) &#123;</div><div class="line"></div><div class="line">    //这时候 article是 null，先把 footer 处理了</div><div class="line">    if (holder instanceof FooterViewHolder) &#123;</div><div class="line">        ((FooterViewHolder) holder).rcvLoadMore.spin();</div><div class="line">        return;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    SimpleArticleItem article = articleList.get(position);</div><div class="line">    String[] imageUrls = article.getImageUrls();</div><div class="line"></div><div class="line">    if (holder instanceof ItemArticleViewHolder) &#123;</div><div class="line">        ItemArticleViewHolder newHolder = (ItemArticleViewHolder) holder;</div><div class="line">        newHolder.rcvArticleTitle.setText(article.getTitle());</div><div class="line">        newHolder.rcvArticleDate.setText(article.getPublishDate());</div><div class="line">        //当图片小于3张时候 选取第1张图片</div><div class="line">        if (imageUrls.length &gt; 0) &#123;</div><div class="line">            newHolder.rcvArticlePhoto.setImageURI(Uri.parse(Constant.BUCKET_HOST_NAME</div><div class="line">                    + imageUrls[0]));</div><div class="line">        &#125; else &#123;</div><div class="line">            newHolder.rcvArticlePhoto.setImageURI(Uri.parse(ApiUrl.randomImageUrl(article.getId())));</div><div class="line">        &#125;</div><div class="line">        //注意这个阅读次数是 int 类型，需要转化为 String 类型</div><div class="line">        newHolder.rcvArticleReadtimes.setText(&quot;浏览: &quot; + article.getReadTimes());</div><div class="line"></div><div class="line">        newHolder.rcvArticleSummary.setText(article.getSummary());</div><div class="line">    &#125; else &#123;</div><div class="line">        MultiImagesViewHolder newHolder = (MultiImagesViewHolder) holder;</div><div class="line">        newHolder.articleTitle.setText(article.getTitle());</div><div class="line">        newHolder.articlePic1.setImageURI(Uri.parse(Constant.BUCKET_HOST_NAME + imageUrls[0]));</div><div class="line">        newHolder.articlePic2.setImageURI(Uri.parse(Constant.BUCKET_HOST_NAME + imageUrls[1]));</div><div class="line">        newHolder.articlePic3.setImageURI(Uri.parse(Constant.BUCKET_HOST_NAME + imageUrls[2]));</div><div class="line">        newHolder.countPics.setText(&quot;图片: &quot; + imageUrls.length);</div><div class="line">        newHolder.countRead.setText(&quot;浏览: &quot; + article.getReadTimes());</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>下拉刷新和上拉加载更多的源码地址（欢迎star） <a href="https://github.com/studychen/SeeNewsV2" target="_blank" rel="external">https://github.com/studychen/SeeNewsV2</a></p>
+<p>本文链接 <a href="http://blog.csdn.net/never_cxb/article/details/50759109" target="_blank" rel="external">http://blog.csdn.net/never_cxb/article/details/50759109</a> 转载请注明出处</p>
+<h1 id="一些坑"><a href="#一些坑" class="headerlink" title="一些坑"></a>一些坑</h1><p>注意给RecyclerView setLayoutManager，不然RecyclerView可能不显示<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">// 1. get a reference to recyclerView</div><div class="line">RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list);</div><div class="line"></div><div class="line">// 2. set layoutManger</div><div class="line">recyclerView.setLayoutManager(new LinearLayoutManager(this));</div></pre></td></tr></table></figure></p>
+<h1 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h1><ul>
+<li><a href="http://android-pratap.blogspot.com/2015/06/endless-recyclerview-with-progress-bar.html" target="_blank" rel="external">LoadMore RecyclerView with progress bar showing at bottom</a></li>
+<li><a href="http://blog.csdn.net/never_cxb/article/details/50495505" target="_blank" rel="external">Android Material Design学习之RecyclerView代替 ListView</a></li>
+<li><a href="http://sapandiwakar.in/pull-to-refresh-for-android-recyclerview-or-any-other-vertically-scrolling-view/" target="_blank" rel="external">Swipe/Pull to Refresh for Android RecyclerView (or any other vertically scrolling view)</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2016/08/25/recyclerview-push/" data-id="ciyyds56c0014buxbjzq6k42z" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/08/25/arrays-sort/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          百度面试题 20个数组 每个500个元素 升序排列 找出前500的数
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/08/25/gif-record/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">如何演示你的App? Android录制Gif动态图教程</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MaterialDesign/">MaterialDesign</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/七牛/">七牛</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/命令行/">命令行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工具/">工具</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/排序/">排序</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数组/">数组</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫/">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络/">网络</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试/">面试</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Android/" style="font-size: 18px;">Android</a> <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Linux/" style="font-size: 10px;">Linux</a> <a href="/tags/MaterialDesign/" style="font-size: 10px;">MaterialDesign</a> <a href="/tags/Python/" style="font-size: 12px;">Python</a> <a href="/tags/七牛/" style="font-size: 10px;">七牛</a> <a href="/tags/命令行/" style="font-size: 10px;">命令行</a> <a href="/tags/工具/" style="font-size: 14px;">工具</a> <a href="/tags/排序/" style="font-size: 10px;">排序</a> <a href="/tags/数组/" style="font-size: 10px;">数组</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/网络/" style="font-size: 10px;">网络</a> <a href="/tags/面试/" style="font-size: 16px;">面试</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/09/04/hexo-tips/">从 CSDN 博客迁移到个人 Hexo 站点的一点坑</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/09/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2016/11/25/campus-interview/">2017互联网校园招聘的一些面试题</a>
+          </li>
+        
+          <li>
+            <a href="/2016/10/03/javac-error/">javac、javap命令行执行 java 程序的一点小坑</a>
+          </li>
+        
+          <li>
+            <a href="/2016/10/02/sort-summary/">经典排序算法总结--冒泡、快排、插入、希尔、归并、选择</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
